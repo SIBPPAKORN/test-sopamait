@@ -5,10 +5,10 @@ import { FaPencilAlt } from "react-icons/fa";
 
 type Props = {
 	datainfo: dataUser[];
+	onEdit: (user: dataUser) => void;
 };
 
-const Table: React.FC<Props> = ({ datainfo }) => {
-	//แปลงตัวอักษรย่อ
+const Table: React.FC<Props> = ({ datainfo, onEdit }) => {
 	const getGenderAbbreviation = (gender: string) => {
 		switch (gender) {
 			case "Male":
@@ -73,7 +73,10 @@ const Table: React.FC<Props> = ({ datainfo }) => {
 						</td>
 						<td className="px-6 py-4 whitespace-nowrap text-base text-black">
 							{/* biome-ignore lint/a11y/useButtonType: <explanation> */}
-							<button className="text-blue-600 hover:text-blue-900">
+							<button
+								onClick={() => onEdit(row)}
+								className="text-blue-600 hover:text-blue-900"
+							>
 								<FaPencilAlt className="font-bold" />
 							</button>
 						</td>
@@ -84,7 +87,7 @@ const Table: React.FC<Props> = ({ datainfo }) => {
 							{row.lastname}
 						</td>
 						<td className="px-6 py-4 whitespace-nowrap text-base text-black">
-							{getGenderAbbreviation(row.gender)}
+							{row.gender}
 						</td>
 						<td className="px-6 py-4 whitespace-nowrap text-base text-black">
 							{row.score}

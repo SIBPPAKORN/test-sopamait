@@ -21,6 +21,9 @@ const AddInformationForm: React.FC = () => {
 	//เก็บข้อความ Errors ต่างๆ
 	const [errors, setErrors] = useState<Partial<dataUser>>({});
 
+	//ใช้ในการเก้บเเเก้ไขข้อมูล
+	const [isEditing, setIsEditing] = useState<boolean>(false);
+
 	//ใช้อัพเดต Form เมื่อมีการเปลี่ยนเเปลง
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
 		const { name, value } = e.target;
@@ -35,6 +38,7 @@ const AddInformationForm: React.FC = () => {
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
 		const newErrors: Partial<dataUser> = {};
+		// biome-ignore lint/complexity/noForEach: <explanation>
 		Object.keys(formData).forEach((key) => {
 			if (!formData[key as keyof dataUser] && formData[key as keyof dataUser] !== 0) {
 				newErrors[key as keyof dataUser] = `${key} is required`;
@@ -50,15 +54,20 @@ const AddInformationForm: React.FC = () => {
 		}
 		setErrors(newErrors);
 		if (Object.keys(newErrors).length === 0) {
-			const newData = { ...formData };
-			setData([...data, newData]);
-			setFormData({
-				id: formData.id + 1,
-				firstname: "",
-				lastname: "",
-				gender: "",
-				score: 0,
-			});
+			if (isEditing) {
+				setData(data.map((d) => (d.id === formData.id ? { ...formData } : d))); // แปลง user เป็น dataUser
+				setIsEditing(false);
+			} else {
+				const newData = { ...formData };
+				setData([...data, newData]);
+				setFormData({
+					id: formData.id + 1,
+					firstname: "",
+					lastname: "",
+					gender: "",
+					score: 0,
+				});
+			}
 		}
 	};
 
@@ -71,6 +80,12 @@ const AddInformationForm: React.FC = () => {
 			gender: "",
 			score: 0,
 		});
+		setIsEditing(false);
+	};
+
+	const handleEdit = (user: dataUser) => {
+		setFormData(user);
+		setIsEditing(true);
 	};
 
 	//กำหนดค่าเริ่มต้นของ data
@@ -145,7 +160,7 @@ const AddInformationForm: React.FC = () => {
 				</div>
 				<div className="flex justify-between">
 					<button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md">
-						ADD
+						{isEditing ? "EDIT" : "ADD"}
 					</button>
 					<button
 						type="button"
@@ -158,7 +173,7 @@ const AddInformationForm: React.FC = () => {
 			</form>
 			<hr className="my-8" />
 			<div>
-				<Table datainfo={data} />
+				<Table datainfo={data} onEdit={handleEdit} />
 			</div>
 		</main>
 	);
